@@ -93,36 +93,6 @@ Debug the kickstart interactively:
 make debug-squashfs   # LMC with VNC at 127.0.0.1:5, poweroff commented out
 ```
 
-## 6. Troubleshooting
-
-Permission denied when launching QEMU/libguestfs
-
-If you see errors like Could not open '...squashfs.img': Permission denied during the build, it is caused by SELinux restricting the libvirt backend from reading files in your home directory.
-Fix: Ensure you are exporting LIBGUESTFS_BACKEND=direct before running make, or change the SELinux context of your build directory:
-
-```bash
-sudo chcon -R -t virt_image_t /path/to/ovirt-node-ng-image/
-```
-
-**mkdir: cannot create directory ‘bootiso.d’: File exists**
-
-If a previous build fails midway, it may leave behind the bootiso.d extraction directory. The d**erive-boot-iso.sh** script expects a clean slate.
-Fix: Remove the leftover directory and restart the build:
-
-```bash
-rm -rf bootiso.d
-sudo -E make iso
-```
-
-**mount: mntroot: failed to setup loop device**
-
-The **derive-boot-iso.sh** script uses the standard Linux **mount** command to extract and inject files into the squashfs/rootfs images. This strictly requires root privileges (**CAP_SYS_ADMIN**).
-Fix: You must run the build process with **sudo** (e.g., **sudo -E make iso**).
-
-**supermin: warning: ... Permission denied (ignored)**
-
-You may see warnings from supermin about files like utempter or unix_update being unreadable. These are safe to ignore. They are normal warnings about non-public distro files that do not affect the appliance build.
-
 ## How to contribute
 
 All contributions are welcome - patches, bug reports, and documentation issues.
